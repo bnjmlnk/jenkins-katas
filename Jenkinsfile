@@ -5,9 +5,9 @@ pipeline {
   }
 
   stages {
-    stage('clone down') {    
+    stage('clone down') {
         steps {
-          stash exclude '.git', name: 'code'
+          stash excludes: '.git', name: 'code'
         }
     }
 
@@ -24,11 +24,12 @@ pipeline {
               docker {
                 image 'gradle:jdk11'
               }
-
-              options {
-                skipDefaultCheckout true
-              }
             }
+
+            options {
+                skipDefaultCheckout true
+            }
+
             steps {
               unstash 'code'
               sh 'ci/build-app.sh'
@@ -44,11 +45,12 @@ pipeline {
               docker {
                 image 'gradle:jdk11'
               }
-
-              options {
-                skipDefaultCheckout true
-              }
             }
+
+            options {
+                skipDefaultCheckout true
+            }
+
             steps {
               unstash 'code'
             }
