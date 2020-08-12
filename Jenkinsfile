@@ -59,32 +59,46 @@ pipeline {
             }
           }
         }
-
       }
 
       stage('push docker app') {
+      options {
+        skipDefaultCheckout true
+      }
 
-              options {
-                  skipDefaultCheckout true
-              }
+      environment {
+        DOCKERCREDS = credentials('docker_login') //use the credentials just created in this stage
+      }
 
-              environment {
-                  DOCKERCREDS = credentials('docker_login') //use the credentials just created in this stage
-              }
+      when {
+        beforeAgent true
+        branch 'master'
+      }
 
-              when {
-                beforeAgent true
-                branch 'master'
-              }
+      steps {
+        unstash 'code' //unstash the repository code
+        sh 'ci/build-docker.sh'
+        sh 'echo "$DOCKERCREDS_PSW" | docker login -u "$DOCKERCREDS_USR" --password-stdin' //login to docker hub with the credentials above
+        sh 'ci/push-docker.sh'
+      }
+      }
 
-              steps {
-                  unstash 'code' //unstash the repository code
-                  sh 'ci/build-docker.sh'
-                  sh 'echo "$DOCKERCREDS_PSW" | docker login -u "$DOCKERCREDS_USR" --password-stdin' //login to docker hub with the credentials above
-                  sh 'ci/push-docker.sh'
-              }
+        stage('component test') {
+      options {
+        skipDefaultCheckout(true)
+      }
 
-            }
+      when {
+        not {
+          branch 'dev/'
+        }
+      }
+
+      steps {
+        unstash 'code'
+        sh 'ci/component-test.sh'
+      }
+        }
   }
 }
 
