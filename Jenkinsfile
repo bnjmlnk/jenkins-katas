@@ -72,6 +72,13 @@ pipeline {
                   DOCKERCREDS = credentials('docker_login') //use the credentials just created in this stage
               }
 
+              }
+
+              when {
+                beforeAgent true
+                branch 'master'
+              }
+
               steps {
                   unstash 'code' //unstash the repository code
                   sh 'ci/build-docker.sh'
