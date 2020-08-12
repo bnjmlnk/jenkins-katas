@@ -72,8 +72,6 @@ pipeline {
                   DOCKERCREDS = credentials('docker_login') //use the credentials just created in this stage
               }
 
-              }
-
               when {
                 beforeAgent true
                 branch 'master'
